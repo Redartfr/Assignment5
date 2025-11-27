@@ -21,23 +21,25 @@ st.write("Upload the juice sales dataset to begin.")
 # File uploader
 uploaded_file = st.file_uploader("Upload CSV or Excel file", type=["csv", "xlsx"])
 
+# Correct load_data function (ONLY ONE!)
 def load_data(file):
-    """Load CSV or Excel file into DataFrame."""
-    if file is None:
-        return None
-    if file.name.endswith(".csv"):
+    """Load CSV or Excel file into DataFrame safely."""
+    try:
+        return pd.read_excel(file, engine="openpyxl")
+    except:
+        file.seek(0)
         return pd.read_csv(file)
-    else:
-        return pd.read_excel(file)
 
-df = load_data(uploaded_file)
+# Load dataset
+df = None
+if uploaded_file is not None:
+    df = load_data(uploaded_file)
 
 # Stop program if no file uploaded
 if df is None:
     st.stop()
 
 st.success("File uploaded successfully.")
-
 # Dataset preview
 with st.expander("Preview Dataset"):
     st.write("First 5 Rows")
